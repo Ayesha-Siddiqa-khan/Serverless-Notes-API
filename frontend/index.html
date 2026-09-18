@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serverless Notes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+                <h1>Serverless Notes</h1>
+            </div>
+            <p class="subtitle">AWS Lambda + DynamoDB + API Gateway</p>
+        </header>
+
+        <div class="config">
+            <label for="apiUrl">API Endpoint</label>
+            <input type="text" id="apiUrl" placeholder="https://your-api-id.execute-api.region.amazonaws.com">
+        </div>
+
+        <div class="note-form">
+            <h2 id="formTitle">New Note</h2>
+            <form id="noteForm">
+                <input type="hidden" id="noteId">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" placeholder="Note title" required>
+                </div>
+                <div class="form-group">
+                    <label for="content">Content</label>
+                    <textarea id="content" rows="4" placeholder="Write your note..." required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Create Note</button>
+                    <button type="button" class="btn btn-secondary" id="cancelBtn" style="display:none">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="notes-header">
+            <h2>My Notes</h2>
+            <button class="btn btn-outline" id="refreshBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                Refresh
+            </button>
+        </div>
+
+        <div class="notes-grid" id="notesContainer">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Loading notes...</p>
+            </div>
+        </div>
+
+        <div class="empty-state" id="emptyState" style="display:none">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <h3>No notes yet</h3>
+            <p>Create your first note above!</p>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

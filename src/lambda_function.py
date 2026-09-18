@@ -6,9 +6,16 @@ from datetime import datetime, timezone
 import boto3
 from botocore.exceptions import ClientError
 
-dynamodb = boto3.resource("dynamodb")
-TABLE_NAME = os.environ.get("NOTES_TABLE_NAME", "ServerlessNotes")
-table = dynamodb.Table(TABLE_NAME)
+_table = None
+
+
+def _get_table():
+    global _table
+    if _table is None:
+        dynamodb = boto3.resource("dynamodb")
+        table_name = os.environ.get("NOTES_TABLE_NAME", "ServerlessNotes")
+        _table = dynamodb.Table(table_name)
+    return _table
 
 
 def lambda_handler(event, context):
@@ -60,6 +67,7 @@ def create_note(event):
         "createdAt": created_at,
     }
 
+    table = _get_table()
     table.put_item(Item=item)
     print(f"Created note: {note_id}")
 
@@ -67,14 +75,14 @@ def create_note(event):
 
 
 def get_notes():
-    result = table.scan()
+    result = _get_table().scan()
     notes = result.get("Items", [])
     print(f"Retrieved {len(notes)} notes")
     return response(200, {"notes": notes})
 
 
 def get_note(note_id):
-    result = table.get_item(Key={"noteId": note_id})
+    result = _get_table().get_item(Key={"noteId": note_id})
     item = result.get("Item")
 
     if not item:
@@ -85,11 +93,12 @@ def get_note(note_id):
 
 
 def delete_note(note_id):
-    result = table.get_item(Key={"noteId": note_id})
+    t = _get_table()
+    result = t.get_item(Key={"noteId": note_id})
     if not result.get("Item"):
         return response(404, {"error": "Note not found"})
 
-    table.delete_item(Key={"noteId": note_id})
+    t.delete_item(Key={"noteId": note_id})
     print(f"Deleted note: {note_id}")
 
     return response(200, {"message": "Note deleted successfully"})

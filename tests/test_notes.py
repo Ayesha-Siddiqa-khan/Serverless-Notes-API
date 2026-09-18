@@ -5,7 +5,8 @@ from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-import lambda_function
+with patch("boto3.resource"):
+    import lambda_function
 
 
 def test_create_note_success():
@@ -14,13 +15,14 @@ def test_create_note_success():
         "path": "/notes",
         "body": json.dumps({"title": "Test", "content": "Content"}),
     }
-    with patch.object(lambda_function.table, "put_item") as mock_put:
-        mock_put.return_value = {}
+    mock_table = MagicMock()
+    mock_table.put_item.return_value = {}
+    with patch.object(lambda_function, "_get_table", return_value=mock_table):
         result = lambda_function.lambda_handler(event, None)
-        assert result["statusCode"] == 201
-        body = json.loads(result["body"])
-        assert body["message"] == "Note created successfully"
-        assert "noteId" in body["note"]
+    assert result["statusCode"] == 201
+    body = json.loads(result["body"])
+    assert body["message"] == "Note created successfully"
+    assert "noteId" in body["note"]
 
 
 def test_create_note_missing_fields():
@@ -41,12 +43,13 @@ def test_create_note_invalid_json():
 
 def test_get_notes():
     event = {"httpMethod": "GET", "path": "/notes"}
-    with patch.object(lambda_function.table, "scan") as mock_scan:
-        mock_scan.return_value = {"Items": [{"noteId": "1", "title": "T"}]}
+    mock_table = MagicMock()
+    mock_table.scan.return_value = {"Items": [{"noteId": "1", "title": "T"}]}
+    with patch.object(lambda_function, "_get_table", return_value=mock_table):
         result = lambda_function.lambda_handler(event, None)
-        assert result["statusCode"] == 200
-        body = json.loads(result["body"])
-        assert len(body["notes"]) == 1
+    assert result["statusCode"] == 200
+    body = json.loads(result["body"])
+    assert len(body["notes"]) == 1
 
 
 def test_get_note_found():
@@ -55,10 +58,11 @@ def test_get_note_found():
         "path": "/notes/abc123",
         "pathParameters": {"id": "abc123"},
     }
-    with patch.object(lambda_function.table, "get_item") as mock_get:
-        mock_get.return_value = {"Item": {"noteId": "abc123", "title": "T"}}
+    mock_table = MagicMock()
+    mock_table.get_item.return_value = {"Item": {"noteId": "abc123", "title": "T"}}
+    with patch.object(lambda_function, "_get_table", return_value=mock_table):
         result = lambda_function.lambda_handler(event, None)
-        assert result["statusCode"] == 200
+    assert result["statusCode"] == 200
 
 
 def test_get_note_not_found():
@@ -67,10 +71,11 @@ def test_get_note_not_found():
         "path": "/notes/missing",
         "pathParameters": {"id": "missing"},
     }
-    with patch.object(lambda_function.table, "get_item") as mock_get:
-        mock_get.return_value = {}
+    mock_table = MagicMock()
+    mock_table.get_item.return_value = {}
+    with patch.object(lambda_function, "_get_table", return_value=mock_table):
         result = lambda_function.lambda_handler(event, None)
-        assert result["statusCode"] == 404
+    assert result["statusCode"] == 404
 
 
 def test_delete_note_found():
@@ -79,13 +84,12 @@ def test_delete_note_found():
         "path": "/notes/abc123",
         "pathParameters": {"id": "abc123"},
     }
-    with patch.object(lambda_function.table, "get_item") as mock_get, patch.object(
-        lambda_function.table, "delete_item"
-    ) as mock_del:
-        mock_get.return_value = {"Item": {"noteId": "abc123"}}
-        mock_del.return_value = {}
+    mock_table = MagicMock()
+    mock_table.get_item.return_value = {"Item": {"noteId": "abc123"}}
+    mock_table.delete_item.return_value = {}
+    with patch.object(lambda_function, "_get_table", return_value=mock_table):
         result = lambda_function.lambda_handler(event, None)
-        assert result["statusCode"] == 200
+    assert result["statusCode"] == 200
 
 
 def test_delete_note_not_found():
@@ -94,10 +98,11 @@ def test_delete_note_not_found():
         "path": "/notes/missing",
         "pathParameters": {"id": "missing"},
     }
-    with patch.object(lambda_function.table, "get_item") as mock_get:
-        mock_get.return_value = {}
+    mock_table = MagicMock()
+    mock_table.get_item.return_value = {}
+    with patch.object(lambda_function, "_get_table", return_value=mock_table):
         result = lambda_function.lambda_handler(event, None)
-        assert result["statusCode"] == 404
+    assert result["statusCode"] == 404
 
 
 def test_unknown_route():

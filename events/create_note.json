@@ -1,0 +1,5 @@
+{
+  "httpMethod": "POST",
+  "path": "/notes",
+  "body": "{\"title\": \"Learn AWS Lambda\", \"content\": \"Build a simple serverless API.\"}"
+}

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serverless-notes-api
+  labels:
+    app: serverless-notes-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: serverless-notes-api
+  template:
+    metadata:
+      labels:
+        app: serverless-notes-api
+    spec:
+      containers:
+        - name: notes-api
+          image: serverless-notes-api:latest
+          ports:
+            - containerPort: 9000
+          env:
+            - name: NOTES_TABLE_NAME
+              value: ServerlessNotes
+            - name: AWS_REGION
+              value: us-east-1
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"

@@ -1,0 +1,7 @@
+{
+  "httpMethod": "DELETE",
+  "path": "/notes/abc123",
+  "pathParameters": {
+    "id": "abc123"
+  }
+}

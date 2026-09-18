@@ -1,25 +1,36 @@
 terraform {
-  required_version = ">= 1.0"
-
+  required_version = ">= 1.6"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
   }
 }
 
 provider "aws" {
-  region = var.aws_region
+  region = "us-east-1"
+  default_tags {
+    tags = {
+      Project           = "Serverless Notes API"
+      Environment       = "dev"
+      ManagedBy         = "TerraPilot"
+      TerraPilotProject = "Serverless Notes API"
+    }
+  }
+}
+
+resource "random_id" "suffix" {
+  byte_length = 4
 }
 
 locals {
-  function_name = "serverless-notes-api"
-  table_name    = "ServerlessNotes"
-}
-
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/../src"
-  output_path = "${path.module}/lambda.zip"
+  resource_prefix = replace(
+    (var.project_name == var.environment || endswith(var.project_name, "-dev")) ? var.project_name : "${var.project_name}-${var.environment}",
+    " ", "-"
+  )
 }

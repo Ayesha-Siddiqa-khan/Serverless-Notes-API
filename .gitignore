@@ -23,3 +23,10 @@ terraform/.terraform.lock.hcl
 # OS
 .DS_Store
 Thumbs.db
+
+# Kubeconfig credentials (cluster-admin keys; base64 goes to GitHub Secret KUBE_CONFIG_DATA only)
+kubeconfig
+kubeconfig.*
+kubeconfig-*
+*.b64
+terraform/.terraform.tfstate.lock.info

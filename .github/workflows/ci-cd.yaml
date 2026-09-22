@@ -30,8 +30,4 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
-      - uses: hashicorp/setup-terraform@v3
-      - run: terraform init
-        working-directory: terraform
-      - run: terraform apply -auto-approve
-        working-directory: terraform
+      - run: aws sts get-caller-identity

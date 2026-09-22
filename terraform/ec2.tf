@@ -84,7 +84,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
 apt-get install -y apt-transport-https ca-certificates curl gnupg
 install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --batch --yes --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' > /etc/apt/sources.list.d/kubernetes.list
 apt-get update -y
 apt-get install -y kubectl
@@ -100,7 +100,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
 apt-get install -y apt-transport-https ca-certificates curl gnupg
 install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --batch --yes --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' > /etc/apt/sources.list.d/kubernetes.list
 apt-get update -y
 apt-get install -y kubectl
@@ -277,7 +277,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
 apt-get install -y apt-transport-https ca-certificates curl gnupg
 install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --batch --yes --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' > /etc/apt/sources.list.d/kubernetes.list
 apt-get update -y
 apt-get install -y kubectl
@@ -293,7 +293,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
 apt-get install -y apt-transport-https ca-certificates curl gnupg
 install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --batch --yes --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' > /etc/apt/sources.list.d/kubernetes.list
 apt-get update -y
 apt-get install -y kubectl
@@ -511,8 +511,8 @@ locals {
 
 
 locals {
-  terrapilot_ssm_join_private_path = "/terrapilot/${var.project_name}/${var.environment}/kubernetes/join-command/private"
-  terrapilot_ssm_join_public_path  = "/terrapilot/${var.project_name}/${var.environment}/kubernetes/join-command/public"
+  terrapilot_ssm_join_private_path = "/terrapilot/${local.resource_prefix}/kubernetes/join-command/private"
+  terrapilot_ssm_join_public_path  = "/terrapilot/${local.resource_prefix}/kubernetes/join-command/public"
   terrapilot_ssm_auto_join_enabled = true
 }
 
@@ -553,7 +553,10 @@ resource "aws_iam_policy" "terrapilot_worker_join_ssm" {
           "ssm:GetParameter",
           "ssm:GetParameters"
         ]
-        Resource = "arn:aws:ssm:*:*:parameter/terrapilot/${var.project_name}/${var.environment}/*"
+        Resource = [
+          "arn:aws:ssm:*:*:parameter/terrapilot/${local.resource_prefix}/*",
+          "arn:aws:ssm:*:*:parameter/terrapilot/${var.project_name}/*"
+        ]
       }
     ]
   })
@@ -586,7 +589,11 @@ resource "aws_iam_policy" "terrapilot_bootstrap_s3_access" {
           "s3:ListBucket",
           "s3:GetBucketLocation"
         ]
-        Resource = "arn:aws:s3:::${local.resource_prefix}-*"
+        Resource = [
+          aws_s3_bucket.bootstrap.arn,
+          "arn:aws:s3:::${lower(local.resource_prefix)}-*",
+          "arn:aws:s3:::${local.resource_prefix}-*"
+        ]
       },
       {
         Sid    = "AllowGetBootstrapObjects"
@@ -594,7 +601,11 @@ resource "aws_iam_policy" "terrapilot_bootstrap_s3_access" {
         Action = [
           "s3:GetObject"
         ]
-        Resource = "arn:aws:s3:::${local.resource_prefix}-*/scripts/*"
+        Resource = [
+          "${aws_s3_bucket.bootstrap.arn}/*",
+          "arn:aws:s3:::${lower(local.resource_prefix)}-*/scripts/*",
+          "arn:aws:s3:::${local.resource_prefix}-*/scripts/*"
+        ]
       }
     ]
   })

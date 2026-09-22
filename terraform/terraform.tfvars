@@ -39,6 +39,7 @@ ecr_image_tag_mutability                   = "IMMUTABLE"
 ecr_scan_on_push                           = false
 ecr_lifecycle_policy_enabled               = false
 github_repository                          = "Ayesha-Siddiqa-khan/Serverless-Notes-API"
+github_oidc_sub                            = "repo:Ayesha-Siddiqa-khan@179512742/Serverless-Notes-API@1375763719:ref:refs/heads/main"
 github_branch                              = "main"
 github_oidc_audience                       = "sts.amazonaws.com"
 enable_kubernetes_ingress_nlb              = false

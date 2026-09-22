@@ -357,6 +357,12 @@ variable "github_repository" {
   default     = ""
 }
 
+variable "github_oidc_sub" {
+  description = "Exact OIDC sub claim allowed to assume the CI role (immutable format: repo:owner@id/repo@id:ref:refs/heads/branch)"
+  type        = string
+  default     = ""
+}
+
 variable "github_branch" {
   description = "GitHub branch allowed to assume the generated OIDC role"
   type        = string

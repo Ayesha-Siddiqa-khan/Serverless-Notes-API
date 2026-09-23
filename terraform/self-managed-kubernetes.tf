@@ -167,7 +167,7 @@ resource "aws_route53_record" "app_alias" {
 
 resource "aws_s3_bucket" "postgres_backups" {
   bucket        = local.postgres_backup_bucket_name
-  force_destroy = false
+  force_destroy = true
 
   tags = {
     Name                   = local.postgres_backup_bucket_name

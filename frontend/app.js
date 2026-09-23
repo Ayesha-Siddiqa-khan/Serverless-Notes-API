@@ -1,4 +1,5 @@
 const API_URL_KEY = 'notes_api_url';
+const DEFAULT_API_URL = 'https://yzaw3mylo9.execute-api.us-east-1.amazonaws.com';
 let notes = [];
 let editingId = null;
 
@@ -16,7 +17,7 @@ const emptyState = document.getElementById('emptyState');
 const loading = document.getElementById('loading');
 const toast = document.getElementById('toast');
 
-apiUrlInput.value = localStorage.getItem(API_URL_KEY) || '';
+apiUrlInput.value = localStorage.getItem(API_URL_KEY) || DEFAULT_API_URL;
 apiUrlInput.addEventListener('change', () => {
     localStorage.setItem(API_URL_KEY, apiUrlInput.value);
 });

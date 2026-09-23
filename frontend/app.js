@@ -154,6 +154,11 @@ async function loadNotes() {
 
         loading.style.display = 'none';
 
+        const notesCountBadge = document.getElementById('notesCount');
+        if (notesCountBadge) {
+            notesCountBadge.textContent = `${notes.length} ${notes.length === 1 ? 'note' : 'notes'}`;
+        }
+
         if (notes.length === 0) {
             emptyState.style.display = 'block';
             return;
